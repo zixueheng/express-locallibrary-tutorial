@@ -1,0 +1,276 @@
+doctype html
+html(lang="en")
+  head
+    title= title
+    script(type='text/javascript').
+  body
+    h1= title
+
+    p This is a line with #[em some emphasis] and #[strong strong text] markup.
+    p This line has un-escaped data: !{'<em> is emphasised</em>'} and escaped data: #{'<em> is not emphasised</em>'}. 
+      | This line follows on.
+    p= 'Evaluated and <em>escaped expression</em>:' + title
+
+    <!-- You can add HTML comments directly -->
+    // You can add single line JavaScript comments and they are generated to HTML comments
+    //- Introducing a single line JavaScript comment with "//-" ensures the comment isn't rendered to HTML 
+    
+    p A line with a link 
+      a(href='/catalog/authors') Some link text
+      |  and some extra text.
+    
+    #container.col
+      if title
+        p A variable named "title" exists.
+      else
+        p A variable named "title" does not exist.
+      p.
+        Pug is a terse and simple template language with a
+        strong focus on performance and powerful features.
+        
+    h2 Generate a list
+        
+    ul
+      each val in [1, 2, 3, 4, 5]
+        li= val
+    
+
+    //- 属性
+    a(href='baidu.com') 百度
+    |
+    |
+    a(class='button' href='baidu.com') 百度
+    |
+    |
+    a(class='button', href='baidu.com') 百度
+
+    input(type='checkbox' name='agreement' checked data-json=`{"非常": "长的","数据": true}` onclick='play()')
+
+    div(class='div-class', (click)='play()')
+    div(class='div-class' '(click)'='play()')
+    
+    //- 定义变量
+    - var url = 'pug-test.html';
+    a(href='/' + url) 链接
+    |
+    |
+    - url = 'https://example.com/' //-重置变量
+    a(href=url) 另一个链接
+
+    div(class="<code>") 转义字符，默认所有的属性都是转义的（即把特殊字符转换成转义序列）
+    div(class!="<code>") 不转义字符，用 !=
+
+    a(style={color: 'red', background: 'green'}) 样式属性
+
+    - var classes = ['foo', 'bar', 'baz']
+    a(class=classes) 类属性
+    |
+    |
+    //- the class attribute may also be repeated to merge arrays
+    a.bang(class=classes class=['bing'])
+    
+    //- 它还可以是一个将类名映射为 true 或 false 的对象，这在使用条件性的类的时候非常有用。
+    - var currentUrl = '/about'
+    a(class={active: currentUrl === '/'} href='/') Home
+    |
+    |
+    a(class={active: currentUrl === '/about'} href='/about') About
+    br
+
+    a.button 类可以使用 .classname 语法来定义
+    .content 考虑到使用 div 作为标签名这种行为实在是太常见了，所以如果您省略掉标签名称的话，它就是默认值
+
+    a#main-link ID 可以使用 #idname 语法来定义
+    #content 考虑到使用 div 作为标签名这种行为实在是太常见了，所以如果您省略掉标签名称的话，它就是默认值
+
+    div#foo(data-bar="foo")&attributes({'data-foo': 'bar'}) 读作 “and attributes”，&attributes 语法可以将一个对象转化为一个元素的属性列表。
+    - var attributes = {};
+    - attributes.class = 'baz';
+    div#foo(data-bar="foo")&attributes(attributes) 这个对象不一定必须是一个字面值，它同样也可以是一个包含值的对象
+
+
+    //- case 是 JavaScript 的 switch 指令的缩写，并且它接受如下的形式
+    - var friends = 10
+    case friends
+      when 0
+        p 您没有朋友
+      when 1
+        p 您有一个朋友
+      default
+        p 您有 #{friends} 个朋友
+    //- 分支传递 (Case Fall Through)     
+    - var friends = 0
+    case friends
+      when 0
+      when 1
+        p 您的朋友很少
+      default
+        p 您有 #{friends} 个朋友
+    case friends
+      when 0
+        p 在某些情况下，如果您不想输出任何东西的话，您可以明确地加上一个原生的 break 语句
+        - break
+      when 1
+        p 您的朋友很少
+      default
+        p 您有 #{friends} 个朋友
+    //- 块展开    
+    - var friends = 1
+    case friends
+      when 0: p 您没有朋友
+      when 1: p 您有一个朋友
+      default: p 您有 #{friends} 个朋友
+
+
+    //- 用 - 开始一段不直接进行输出的代码
+    - for (var x = 0; x < 3; x++)
+      li item
+    //- Pug 也支持把它们写成一个块的形式：  
+    -
+      var list = ["Uno", "Dos", "Tres",
+              "Cuatro", "Cinco", "Seis"]
+    each item in list
+      li= item
+
+    //- 用 = 开始一段带有输出的代码，它应该是可以被求值的一个 JavaScript 表达式。为安全起见，它将被 HTML 转义：
+    p
+      = '这个代码被 <转义> 了！'
+    p= '这个代码被 <转义> 了！'
+    //- 不转义的、带输出的代码
+    p
+      != '这段文字 <strong>没有</strong> 被转义！'
+    p!= '这段文字' + ' <strong>没有</strong> 被转义！'
+
+
+    //- Pug 的条件判断的一般形式的括号是可选的，所以您可以省略掉开头的 -，效果是完全相同的。类似一个常规的 JavaScript 语法形式。
+    - var user = { description: 'foo bar baz' }
+    - var authorised = false
+    #user
+      if user.description
+        h2.green 描述
+        p.description= user.description
+      else if authorised
+        h2.blue 描述
+        p.description.
+          用户没有添加描述。
+          不写点什么吗……
+      else
+        h2.red 描述
+        p.description 用户没有描述
+    //- Pug 同样也提供了它的反义版本 unless（下面示例的效果是等价的）
+    unless user.isAnonymous
+      p 您已经以 #{user.name} 的身份登录。
+    if !user.isAnonymous
+      p 您已经以 #{user.name} 的身份登录。  
+    
+
+    //- 字符串嵌入，转义 #{ }
+    - var title = "On Dogs: Man's Best Friend";
+    - var author = "enlore";
+    - var theGreat = "<span>转义!</span>";
+    h1= title
+    p #{author} 笔下源于真情的创作。
+    p 这是安全的：#{theGreat}
+    //- title 被简单地求值；但在 #{ 和 } 里面的代码也会被求值，转义，并最终嵌入到模板的渲染输出中。
+    //- 里面可以是任何的正确的 JavaScript 表达式，您可以自由发挥：
+    - var msg = "not my inside voice";
+    p This is #{msg.toUpperCase()}
+
+    //- 字符串嵌入，不转义 !{ }
+    - var riskyBusiness = "<em>我希望通过外籍教师 Peter 找一位英语笔友。</em>";
+    .quote
+      p 李华：!{riskyBusiness}
+
+
+    //- 标签嵌入  #[ ]
+    p.
+      这是一个很长很长而且还很无聊的段落，还没有结束，是的，非常非常地长。
+      突然出现了一个 #[strong 充满力量感的单词]，这确实让人难以 #[em 忽视]。
+    p.
+      使用带属性的嵌入标签的例子：
+      #[q(lang="es") ¡Hola Mundo!]
+
+
+    //- Pug 目前支持两种主要的迭代方式： each 和 while
+    ul
+      each val in [1, 2, 3, 4, 5]
+        li= val
+    //- 您还可以在迭代时获得索引值：
+    ul
+      each val, index in ['〇', '一', '二']
+        li= index + ': ' + val
+    //- Pug 还让您能够迭代对象中的键值
+    ul
+      each val, index in {1:'一',2:'二',3:'三'}
+        li= index + ': ' + val
+    //- while 循环
+    - var n = 0;
+    ul
+      while n < 4
+        li= n++
+    
+
+    //- 混入 Mixin
+    //- 混入是一种允许您在 Pug 中重复使用一整个代码块的方法。
+    //- 定义
+    mixin list
+      ul
+        li foo
+        li bar
+        li baz
+    //- 使用
+    +list
+    +list
+    
+    //- 它们会被编译成函数形式，您可以传递一些参数：
+    mixin pet(name)
+      li.pet= name
+    ul
+      +pet('猫')
+      +pet('狗')
+      +pet('猪')
+
+    //- 混入也可以把一整个代码块像内容一样传递进来：
+    mixin article(title)
+      .article
+        .article-wrapper
+          h1= title
+          if block
+            block
+          else
+            p 没有提供任何内容。
+    //- 这里没有传入块：
+    +article('Hello world')
+    //- 这里传入了块
+    +article('Hello world')
+      p 块
+      p 块
+    
+
+    //- 标签中的纯文本
+    p 这是一段纯洁的<em>文本</em>内容.
+
+    //-原始 HTML 
+    <p>缩进 body 标签没有意义，</p>
+    <p>因为 HTML 本身对空格不敏感。</p>
+
+    //- 管道文本
+    p
+      | 管道符号总是在最开头，
+      | 不算前面的缩进。
+
+    //- 标签中的纯文本块
+    //- 有的时候您可能想要写一个非常大的纯文本块。一个典型的例子就是用 script 和 style 内嵌 JavaScript 和 CSS 代码。
+    //- 为此，只需要在标签后面紧接一个点 .，在标签有属性的时候，则是紧接在闭括号后面。在标签和点之间不要有空格。块内的纯文本内容必须缩进一层：
+    script(type='text/javascript').
+      var usingPug = true;
+      if (usingPug)
+        console.log('这是明智的选择。')
+      else
+        console.log('请用 Pug。')
+    //- 您也可以在父块内，创建一个“点”块，跟在某个标签的后面:
+    div
+      p This text belongs to the paragraph tag.
+      br
+      .
+        This text belongs to the div tag.    
